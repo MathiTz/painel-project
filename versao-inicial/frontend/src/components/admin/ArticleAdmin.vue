@@ -9,7 +9,7 @@
           type="text"
           v-model="article.name"
           required
-          :readonlye="mode === 'remove'"
+          :readonly="mode === 'remove'"
           placeholder="Informe o Nome do Artigo..."
         />
       </b-form-group>
@@ -19,18 +19,18 @@
           type="text"
           v-model="article.description"
           required
-          :readonlye="mode === 'remove'"
+          :readonly="mode === 'remove'"
           placeholder="Informe a descrição do Artigo..."
         />
       </b-form-group>
-      <b-form-group label="Imagem (URL):" label-for="article-imageUrl">
+      <b-form-group v-if="mode === 'save'" label="Imagem (URL):" label-for="article-imageUrl">
         <b-form-input
           id="article-imageUrl"
           type="text"
           v-model="article.imageUrl"
           required
-          :readonlye="mode === 'remove'"
-          placeholder="Inform a URL da Imagem..."
+          :readonly="mode === 'remove'"
+          placeholder="Informe a URL da Imagem..."
         />
       </b-form-group>
 
@@ -40,7 +40,7 @@
       <b-form-group v-if="mode === 'save'" label="Autor:" label-for="article-userId">
         <b-form-select id="article-userId" :options="users" v-model="article.userId"/>
       </b-form-group>
-      <b-form-group label="Conteúdo" label-for="category-content">
+      <b-form-group v-if="mode === 'save'" label="Conteúdo" label-for="category-content">
         <VueEditor v-model="article.content" placeholder="Informe o Conteúdo do Artigo..."/>
       </b-form-group>
 
@@ -91,7 +91,10 @@ export default {
     loadArticles() {
       const url = `${baseApiUrl}/articles`;
       axios.get(url).then(res => {
-        this.articles = res.data;
+        // this.articles = res.data;
+        this.articles = res.data.data;
+        this.count = res.data.count;
+        this.limit = res.data.limit;
       });
     },
     reset() {
@@ -125,9 +128,27 @@ export default {
       axios
         .get(`${baseApiUrl}/articles/${article.id}`)
         .then(res => (this.article = res.data));
+    },
+    loadCategories() {
+      const url = `${baseApiUrl}/categories`;
+      axios.get(url).then(res => {
+        this.categories = res.data.map(category => {
+          return { value: category.id, text: category.path };
+        });
+      });
+    },
+    loadUsers() {
+      const url = `${baseApiUrl}/users`;
+      axios.get(url).then(res => {
+        this.users = res.data.map(user => {
+          return { value: user.id, text: `${user.name} - ${user.email}` };
+        });
+      });
     }
   },
   mounted() {
+    this.loadUsers();
+    this.loadCategories();
     this.loadArticles();
   }
 };
