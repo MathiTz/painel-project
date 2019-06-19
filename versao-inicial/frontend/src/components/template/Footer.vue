@@ -1,8 +1,8 @@
 <template>
   <footer class="footer">
     <span>
-      Copyright
-      <strong>Cod3r</strong> 2015-2019
+      Design by
+      <strong>Matheus</strong> 2019
     </span>
   </footer>
 </template>
