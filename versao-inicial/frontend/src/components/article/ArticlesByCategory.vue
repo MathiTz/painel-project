@@ -2,7 +2,9 @@
   <div class="articles-by-category">
     <PageTitle icon="fa fa-folder-o" :main="category.name" sub="Categoria"/>
     <ul>
-      <li v-for="article in articles" :key="article.id">{{article.name}}</li>
+      <li v-for="article in articles" :key="article.id">
+        <ArticleItem :article="article"/>
+      </li>
     </ul>
     <div class="load-more">
       <button
@@ -18,9 +20,10 @@
 import { baseApiUrl } from "@/global";
 import axios from "axios";
 import PageTitle from "../template/PageTitle";
+import ArticleItem from "./ArticleItem";
 export default {
   name: "ArticlesByCategory",
-  components: { PageTitle },
+  components: { PageTitle, ArticleItem },
   data: function() {
     return {
       category: {},
@@ -44,6 +47,17 @@ export default {
 
         if (res.data.length === 0) this.loadMore = false;
       });
+    }
+  },
+  watch: {
+    $route(to) {
+      this.category.id = to.params.id;
+      this.articles = [];
+      this.page = 1;
+      this.loadMore = true;
+
+      this.getCategory();
+      this.getArticles();
     }
   },
   mounted() {
